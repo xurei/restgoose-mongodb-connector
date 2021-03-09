@@ -1,0 +1,38 @@
+{
+  "name": "@xureilab/restgoose-mongodb-connector",
+  "version": "0.0.1",
+  "description": "MongoDB Connector for the Restgoose framework",
+  "main": "lib/index.js",
+  "keywords": [
+    "REST",
+    "database",
+    "mongodb",
+    "framework",
+    "connector"
+  ],
+  "scripts": {
+    "build": "node_modules/.bin/rimraf lib/* && npm run tslint && npm run build-ts",
+    "build-ts": "node_modules/.bin/tsc -p .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xurei/restgoose-mongodb-connector.git"
+  },
+  "author": "Olivier Bourdoux",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xurei/restgoose-mongodb-connector/issues"
+  },
+  "homepage": "https://github.com/xurei/restgoose-mongodb-connector#readme",
+  "peerDependencies": {
+    "@xureilab/restgoose": "^2.0.0"
+  },
+  "devDependencies": {
+    "@xureilab/restgoose": "file:../restgoose",
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "mongoose": "5.10.9"
+  }
+}
