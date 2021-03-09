@@ -48,7 +48,7 @@ function buildSchema<T extends RestgooseModel>(modelType: Constructor<T>, schema
 
     let sch: mongoose.Schema;
     const parentCtor = Object.getPrototypeOf(modelType);
-    if (parentCtor && parentCtor.constructor.name !== 'RestgooseModel' && parentCtor.constructor.name !== 'Object') {
+    if (parentCtor && parentCtor.name !== 'RestgooseModel' && parentCtor.name !== 'Object') {
         const parentSchema = buildSchema(parentCtor, schemaOptions);
         sch = parentSchema.clone();
     }
@@ -166,7 +166,7 @@ export class RestgooseMongodbConnector implements RestgooseConnector {
         const mongooseModel = await getMongooseModel(modelType);
         const restgooseReq = req.restgoose || {};
         try {
-            return mongooseModel.find(restgooseReq.query || {}, restgooseReq.projection, restgooseReq.options);
+            return Promise.resolve(await mongooseModel.find(restgooseReq.query || {}, restgooseReq.projection, restgooseReq.options));
         }
         catch (e) {
             handleError(e);
@@ -177,7 +177,7 @@ export class RestgooseMongodbConnector implements RestgooseConnector {
         const mongooseModel = await getMongooseModel(modelType);
         const query = buildOneQuery(req, true);
         try {
-            return mongooseModel.deleteOne(query).then(() => true);
+            return Promise.resolve(await mongooseModel.deleteOne(query).then(() => true));
         }
         catch (e) {
             handleError(e);
@@ -187,7 +187,7 @@ export class RestgooseMongodbConnector implements RestgooseConnector {
         const mongooseModel = await getMongooseModel(modelType);
         const restgooseReq = req.restgoose || {};
         try {
-            return mongooseModel.deleteMany(restgooseReq.query).then(() => true);
+            return Promise.resolve(await mongooseModel.deleteMany(restgooseReq.query).then(() => true));
         }
         catch (e) {
             handleError(e);
@@ -224,7 +224,7 @@ function handleError(error) {
                 });
             }
             else {
-                throw new RestError(404, {
+                throw new RestError(400, {
                     code: ERROR_BAD_FORMAT_CODE,
                     field: error.path,
                 });
