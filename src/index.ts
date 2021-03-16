@@ -173,21 +173,25 @@ export class RestgooseMongodbConnector implements RestgooseConnector {
         }
 
     }
-    async deleteOne <T extends RestgooseModel> (modelType: Constructor<T>, req: RestRequest): Promise<boolean> {
+    async deleteOne <T extends RestgooseModel> (modelType: Constructor<T>, entity: T): Promise<boolean> {
         const mongooseModel = await getMongooseModel(modelType);
-        const query = buildOneQuery(req, true);
         try {
-            return Promise.resolve(await mongooseModel.deleteOne(query).then(() => true));
+            return (
+                Promise.resolve(await mongooseModel.deleteOne({ _id: (entity as Document)._id }))
+                .then(() => true)
+            );
         }
         catch (e) {
             handleError(e);
         }
     }
-    async delete <T extends RestgooseModel> (modelType: Constructor<T>, req: RestRequest): Promise<boolean> {
+    async delete <T extends RestgooseModel> (modelType: Constructor<T>, entities: T[]): Promise<boolean> {
         const mongooseModel = await getMongooseModel(modelType);
-        const restgooseReq = req.restgoose || {};
         try {
-            return Promise.resolve(await mongooseModel.deleteMany(restgooseReq.query).then(() => true));
+            return (
+                Promise.resolve(await mongooseModel.deleteMany({ _id: { $in: entities.map(e => (e as Document)._id) }})
+                .then(() => true))
+            );
         }
         catch (e) {
             handleError(e);
@@ -202,7 +206,7 @@ export class RestgooseMongodbConnector implements RestgooseConnector {
             handleError(e);
         }
     }
-    async save <T extends RestgooseModel> (entity: T): Promise<T> {
+    async save <T extends RestgooseModel> (modelType: Constructor<T>, entity: T): Promise<T> {
         const mongooseEntity = entity as (T & Document);
         try {
             return await mongooseEntity.save();
